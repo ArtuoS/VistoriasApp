@@ -44,52 +44,64 @@ namespace VistoriasProjeto.Views
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
-            {
-                dplTipo.DataSource = Enum.GetValues(typeof(ETipoOcorrencia));
-                dplTipo.DataBind();
+            dplTipo.DataSource = Enum.GetValues(typeof(ETipoOcorrencia));
+            dplTipo.DataBind();
 
-                int vistoriaId = Request.QueryString["vistoriaId"] != null ? Convert.ToInt32(Request.QueryString["vistoriaId"].ToString()) : GLOBALS.Invalid_Id;
-                string action = Request.QueryString["action"] != null ? Request.QueryString["action"].ToString() : string.Empty;
+            int vistoriaId = Request.QueryString["vistoriaId"] != null ? Convert.ToInt32(Request.QueryString["vistoriaId"].ToString()) : GLOBALS.Invalid_Id;
+            int ocorrenciaId = Request.QueryString["ocorrenciaId"] != null ? Convert.ToInt32(Request.QueryString["ocorrenciaId"].ToString()) : GLOBALS.Invalid_Id;
+            string action = Request.QueryString["action"] != null ? Request.QueryString["action"].ToString() : string.Empty;
 
-                var vistoria = VistoriaDao.GetById(vistoriaId);
+            var ocorrencia = OcorrenciaDao.GetById(ocorrenciaId);
 
-                if (vistoriaId > 0 && action != string.Empty)
-                    switch (action)
-                    {
-                        case "Inserir":
-                            btnExcluir.Enabled = false;
-                            btnAtualizar.Enabled = false;
-                            txtIdVistoria.ReadOnly = true;
-                            txtIdOcorrencia.ReadOnly = true;
-                            txtData.ReadOnly = true;
-                            txtIdVistoria.Text = vistoriaId.ToString();
-                            txtData.Text = DateTime.Now.ToString("dd/MM/yyyy");
-                            break;
-                        case "Atualizar":
-                            btnExcluir.Enabled = false;
-                            btnInserir.Enabled = false;
-                            txtIdVistoria.ReadOnly = true;
-                            txtIdOcorrencia.ReadOnly = true;
-                            txtData.ReadOnly = true;
-                            txtIdVistoria.Text = vistoriaId.ToString();
-                            txtData.Text = DateTime.Now.ToString("dd/MM/yyyy");
-                            txtDescricao.Text = vistoria.Descricao;
-                            txtIdOcorrencia.Text = vistoria.Id.ToString();
-                            break;
-                        case "Deletar":
-                            btnAtualizar.Enabled = false;
-                            btnInserir.Enabled = false;
-                            txtIdVistoria.ReadOnly = true;
-                            txtIdOcorrencia.ReadOnly = true;
-                            txtData.ReadOnly = true;
-                            txtIdVistoria.Text = vistoriaId.ToString();
-                            txtData.Text = DateTime.Now.ToString("dd/MM/yyyy");
-                            txtDescricao.Text = vistoria.Descricao;
-                            txtIdOcorrencia.Text = vistoria.Id.ToString();
-                            break;
-                    }
-            }
+            if ((ocorrenciaId > 0 && action != string.Empty) || (ocorrenciaId == GLOBALS.Invalid_Id && action == "Inserir"))
+                switch (action)
+                {
+                    case "Inserir":
+                        btnExcluir.Enabled = false;
+                        btnAtualizar.Enabled = false;
+                        txtIdVistoria.ReadOnly = true;
+                        txtIdOcorrencia.ReadOnly = true;
+                        txtData.ReadOnly = true;
+                        txtIdVistoria.Text = vistoriaId.ToString();
+                        txtData.Text = DateTime.Now.ToString("dd/MM/yyyy");
+                        break;
+                    case "Atualizar":
+                        btnExcluir.Enabled = false;
+                        btnInserir.Enabled = false;
+                        txtIdVistoria.ReadOnly = true;
+                        txtIdOcorrencia.ReadOnly = true;
+                        txtData.ReadOnly = true;
+                        txtIdVistoria.Text = vistoriaId.ToString();
+                        txtData.Text = DateTime.Now.ToString("dd/MM/yyyy");
+                        txtDescricao.Text = ocorrencia.Descricao;
+                        txtIdOcorrencia.Text = ocorrencia.Id.ToString();
+                        break;
+                    case "Excluir":
+                        btnAtualizar.Enabled = false;
+                        btnInserir.Enabled = false;
+                        txtIdVistoria.ReadOnly = true;
+                        txtIdOcorrencia.ReadOnly = true;
+                        txtData.ReadOnly = true;
+                        txtDescricao.ReadOnly = true;
+                        dplTipo.Enabled = false;
+                        txtIdVistoria.Text = vistoriaId.ToString();
+                        txtData.Text = DateTime.Now.ToString("dd/MM/yyyy");
+                        txtDescricao.Text = ocorrencia.Descricao;
+                        txtIdOcorrencia.Text = ocorrencia.Id.ToString();
+                        break;
+                    case "Consultar":
+                        btnAtualizar.Enabled = false;
+                        btnInserir.Enabled = false;
+                        txtIdVistoria.ReadOnly = true;
+                        txtIdOcorrencia.ReadOnly = true;
+                        txtData.ReadOnly = true;
+                        txtDescricao.ReadOnly = true;
+                        dplTipo.Enabled = false;
+                        btnExcluir.Enabled = false;
+                        btnAtualizar.Enabled = false;
+                        btnInserir.Enabled = false;
+                        break;
+                }
         }
 
         protected void btnInserir_Click(object sender, EventArgs e)
@@ -112,20 +124,29 @@ namespace VistoriasProjeto.Views
 
         protected void btnAtualizar_Click(object sender, EventArgs e)
         {
-            var ocorrencia = new Ocorrencia()
-            {
-                VistoriaId = Convert.ToInt32(txtIdVistoria.Text),
-                Tipo = (ETipoOcorrencia)Enum.Parse(typeof(ETipoOcorrencia), dplTipo.SelectedValue),
-                Descricao = txtDescricao.Text,
-                DataOcorrencia = Convert.ToDateTime(txtData.Text, GLOBALS.Culture),
-            };
+            int id = Request.QueryString["vistoriaId"] != null ? Convert.ToInt32(Request.QueryString["vistoriaId"].ToString()) : GLOBALS.Invalid_Id;
 
-            OcorrenciaDao.Update(ocorrencia);
+            if (id != GLOBALS.Invalid_Id)
+            {
+                var ocorrenciaPadrao = OcorrenciaDao.GetById(id);
+
+                var novaOcorrencia = new Ocorrencia()
+                {
+                    VistoriaId = (txtIdVistoria != null) ? Convert.ToInt32(txtIdVistoria.Text) : GLOBALS.Invalid_Id,
+                    Tipo = (ETipoOcorrencia)Enum.Parse(typeof(ETipoOcorrencia), dplTipo.SelectedValue),
+                    Descricao = (txtDescricao != null) ? txtDescricao.Text : "",
+                    DataOcorrencia = (txtData != null) ? Convert.ToDateTime(txtData.Text, GLOBALS.Culture) : default(DateTime),
+                };
+
+                ocorrenciaPadrao.ClonarPropriedades(novaOcorrencia);
+
+                OcorrenciaDao.Update(ocorrenciaPadrao);
+            }
         }
 
         protected void btnFechar_Click(object sender, EventArgs e)
         {
-
+            Response.Redirect("ListaVistorias.aspx");
         }
 
         private void AtualizarGridOcorrenciasPorId(int id)

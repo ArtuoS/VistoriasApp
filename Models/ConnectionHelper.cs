@@ -20,5 +20,14 @@ namespace VistoriasProjeto.Models
             if(connection.State.Equals(ConnectionState.Closed))
                 connection.Open();
         }
+
+        public static void Init(MySqlConnection connection, MySqlCommand command)
+        {
+            OpenConnection(connection);
+            ClearCommand(command);
+        }
+
+        private static void ClearCommand(MySqlCommand command)
+            => command.Parameters.Clear();
     }
 }

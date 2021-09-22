@@ -35,6 +35,11 @@ namespace VistoriasProjeto.Views
                 dplStatus.DataBind();
 
                 AtualizarGridVistorias();
+
+                if (GLOBALS.UsuarioLogado != null && GLOBALS.UsuarioLogado.Perfil == EPerfilUsuario.Operador)
+                {
+                    btnInserirVistoria.Enabled = false;
+                }
             }
         }
 
@@ -69,10 +74,24 @@ namespace VistoriasProjeto.Views
             var row = dgvVistorias.Rows[rowIndex];
             int id = Convert.ToInt32(row.Cells[2].Text);
 
-            if (e.CommandName == "Inserir" || e.CommandName == "Atualizar" || e.CommandName == "Excluir")
-                Response.Redirect($"CadastroVistoria.aspx?id={id}&action={e.CommandName}");
-            else if(e.CommandName == "Ocorrencias")
-                Response.Redirect($"ListaOcorrencias.aspx?id={id}");
+            if (GLOBALS.UsuarioLogado != null && GLOBALS.UsuarioLogado.Perfil == EPerfilUsuario.Operador)
+            {
+                if (e.CommandName == "Atualizar" || e.CommandName == "Excluir")
+                    ScriptManager.RegisterStartupScript(this, GetType(), "showalert", $"alert('O comando {e.CommandName} não está disponível para o grupo {GLOBALS.UsuarioLogado.Perfil.ToString()}');", true);
+                else if (e.CommandName == "Ocorrencias")
+                    Response.Redirect($"ListaOcorrencias.aspx?id={id}");
+                else if(e.CommandName == "Consultar")
+                    Response.Redirect($"CadastroVistoria.aspx?action={e.CommandName}");
+            }
+            else
+            {
+                if (e.CommandName == "Atualizar" || e.CommandName == "Excluir")
+                    Response.Redirect($"CadastroVistoria.aspx?id={id}&action={e.CommandName}");
+                else if (e.CommandName == "Ocorrencias")
+                    Response.Redirect($"ListaOcorrencias.aspx?id={id}");
+                else if (e.CommandName == "Consultar")
+                    Response.Redirect($"CadastroVistoria.aspx?action={e.CommandName}");
+            }
         }
 
         protected void btnAtualizar_Click(object sender, EventArgs e)
@@ -91,6 +110,11 @@ namespace VistoriasProjeto.Views
         }
 
         protected void btnOcorrencias_Click(object sender, EventArgs e)
+        {
+            //Response.Redirect($"CadastroOcorrencia.aspx?id={id}&action={e.CommandName}");
+        }
+
+        protected void btnConsulta_Click(object sender, EventArgs e)
         {
             //Response.Redirect($"CadastroOcorrencia.aspx?id={id}&action={e.CommandName}");
         }

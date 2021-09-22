@@ -1,0 +1,189 @@
+SELECT (CASE WHEN RD.GRUPODIVERSOS = 'S' THEN 1 ELSE 0 END) AS ORDEM,                                                                                                                                                                  
+       RD.HANDLE,                                                                                                                                                                                                                      
+       RD.DESCRICAO,                                                                                                                                                                                                                   
+       PR.GERENCIADORA,                                                                                                                                                                                                                
+       RD.GRUPODIVERSOS,                                                                                                                                                                                                               
+       SUM(PRD.VALORTOTAL) VALORTOTAL,                                                                                                                                                                                                 
+       (CASE WHEN SUM(PRD.VALORNFS) = NULL THEN SUM(VALORTOTALNF) ELSE SUM(PRD.VALORNFS) END) AS VALORNFS,                                                                                                                             
+       PR.MOEDA                                                                                                                                                                                                                        
+    FROM                                                                                                                                                                                                                               
+        GLSG_APOLICES AP                                                                                                                                                                                                               
+        INNER JOIN GLSG_PLANORISCOS PR  ON PR.HANDLE = AP.PLANORISCO                                                                                                                                                                   
+        INNER JOIN GLSG_PLANORISCODESCRICAO RD  ON RD.PLANORISCO = AP.PLANORISCO                                                                                                                                                       
+     LEFT JOIN (                                                                                                                                                                                                                       
+        SELECT PRD2.APOLICE,                                                                                                                                                                                                           
+                          PRD2.PRODUTO,                                                                                                                                                                                                
+                          PRD2.NATUREZAPRODUTO,                                                                                                                                                                                        
+                          PRD2.VALORTOTAL,                                                                                                                                                                                             
+                          PRD2.VALORNFS,                                                                                                                                                                                               
+                          PRD2.VALORTOTALNF                                                                                                                                                                                            
+                     FROM                                                                                                                                                                                                              
+                        (                                                                                                                                                                                                              
+                            (SELECT CP.APOLICE,                                                                                                                                                                                        
+                                   CPI.PRODUTO,                                                                                                                                                                                        
+                                   CPI.NATUREZAPRODUTO,                                                                                                                                                                                
+                                   CPI.VALORTOTAL,                                                                                                                                                                                     
+                                   0 AS VALORNFS,                                                                                                                                                                                      
+                                   0 AS VALORTOTALNF                                                                                                                                                                                   
+                              FROM GLOP_VIAGEMDOCUMENTOS DV                                                                                                                                                                            
+                                   INNER JOIN GLOP_COLETAPEDIDOS CP  ON CP.HANDLE = DV.DOCUMENTOCOLETA AND CP.APOLICE = :APOLICE                                                                                                       
+                                   INNER JOIN GLOP_COLETAPEDIDOITEMS CPI  ON CPI.PEDIDOCOLETA = DV.DOCUMENTOCOLETA                                                                                                                     
+                             WHERE DV.VIAGEM = :VIAGEM                                                                                                                                                                                 
+                                   AND                                                                                                                                                                                                 
+                                    (                                                                                                                                                                                                  
+                                       NOT                                                                                                                                                                                             
+                                        (                                                                                                                                                                                              
+                                           DV.SITUACAO IN (:STCONCLUIDO, :STCONCLUIDORST, :STCANCELADO, :STTRANSBORDO)                                                                                                                 
+                                        )                                                                                                                                                                                              
+                                    )                                                                                                                                                                                                  
+                            )                                                                                                                                                                                                          
+                                                                                                                                                                                                                                       
+                            UNION ALL                                                                                                                                                                                                  
+                                                                                                                                                                                                                                       
+                            (SELECT                                                                                                                                                                                                    
+                                  AD.APOLICE,                                                                                                                                                                                          
+                                  DP.PRODUTO,                                                                                                                                                                                          
+                                  DP.GRUPONATUREZAPRODUTO NATUREZAPRODUTO,                                                                                                                                                             
+                                  0 AS VALORTOTAL,                                                                                                                                                                                     
+                                  DP.VALORTOTAL AS VALORNFS,                                                                                                                                                                           
+                                  DC.VALORTOTAL AS VALORTOTALNF                                                                                                                                                                        
+                             FROM GLSG_AVERBACAODOCUMENTOS AD                                                                                                                                                                          
+                                  INNER JOIN GLOP_VIAGEMDOCUMENTOS DV  ON DV.DOCUMENTOLOGISTICA = AD.DOCUMENTOLOGISTICA AND DV.VIAGEM = :VIAGEM AND (NOT (DV.SITUACAO IN (:STCONCLUIDO, :STCONCLUIDORST, :STCANCELADO, :STTRANSBORDO)))
+                                  INNER JOIN GLOP_VIAGEMPARADAS VP  ON VP.VIAGEM = DV.VIAGEM AND VP.FILIAL = DV.FILIALORIGEM AND VP.HANDLE = :PARADA                                                                                   
+                                  INNER JOIN GLGL_DOCUMENTOCLIENTES DC  ON DC.DOCUMENTOLOGISTICA = DV.DOCUMENTOLOGISTICA                                                                                                               
+                                  LEFT  JOIN GLGL_DOCCLIPRODUTOS DP  ON DP.DOCUMENTOCLIENTE = DC.HANDLE                                                                                                                                
+                            WHERE AD.APOLICE = :APOLICE                                                                                                                                                                                
+                            )                                                                                                                                                                                                          
+                        )    PRD2                                                                                                                                                                                                      
+                    ) PRD ON PRD.APOLICE = AP.HANDLE                                                                                                                                                                                   
+                                                                                                                                                                                                                                       
+    WHERE AP.HANDLE = :APOLICE                                                                                                                                                                                                         
+    AND RD.PLANORISCO = :RISCO                  
+	AND                                                                                                                                                                                          	
+	(                                                                                                                                                                                            
+		(RD.GRUPODIVERSOS = 'S')                                                                                                                                                                 
+		OR                                                                                                                                                                                       
+		(                                                                                                                                                                                        
+			(RD.GRUPODIVERSOS = 'N')                                                                                                                                                             
+			AND                                                                                                                                                                                  
+			   (                                                                                                                                                                                 
+				 RD.GRUPOPRODUTOS = 'N'                                                                                                                                                          
+				 OR                                                                                                                                                                              
+				   (                                                                                                                                                                             
+					(                                                                                                                                                                            
+						(PRD.PRODUTO IS NOT NULL)                                                                                                                                                
+						AND (                                                                                                                                                                    
+								(                                                                                                                                                                
+									(EXISTS                                                                                                                                                      
+										(   SELECT GE.PRODUTO                                                                                                                                    
+											FROM GLSG_PLANORISCOPRODUTOS GE                                                                                                                      
+											WHERE GE.PLANORISCODESC = RD.HANDLE                                                                                                                  
+											AND GE.PRODUTO = PRD.PRODUTO                                                                                                                         
+										)                                                                                                                                                        
+									)                                                                                                                                                            
+																																																 
+								)                                                                                                                                                                
+							)                                                                                                                                                                    
+					)                                                                                                                                                                            
+					OR                                                                                                                                                                           
+					(                                                                                                                                                                            
+						(                                                                                                                                                                        
+							(EXISTS                                                                                                                                                              
+								(SELECT GE.GRUPOPRODUTO                                                                                                                                          
+									FROM GLSG_PLANRISCOGRPPROD GE                                                                                                                                
+									WHERE GE.PLANORISCODESC = RD.HANDLE                                                                                                                          
+									AND GE.GRUPOPRODUTO = PRD.NATUREZAPRODUTO                                                                                                                    
+								)                                                                                                                                                                
+							)                                                                                                                                                                    
+																																																 
+							OR                                                                                                                                                                   
+																																																 
+							(NOT EXISTS                                                                                                                                                          
+								(   SELECT GE.GRUPOPRODUTO                                                                                                                                       
+									FROM GLSG_PLANRISCOGRPPROD GE                                                                                                                                
+									WHERE GE.PLANORISCODESC = RD.HANDLE                                                                                                                          
+								)                                                                                                                                                                
+							)                                                                                                                                                                    
+							)                                                                                                                                                                    
+					)                                                                                                                                                                            
+				  )                                                                                                                                                                              
+				)                                                                                                                                                                                
+				AND                                                                                                                                                                              
+				(                                                                                                                                                                                
+																																																 
+					(                                                                                                                                                                            
+						(RD.PERCURSOS = 'N')                                                                                                                                                     
+																																																 
+						OR                                                                                                                                                                       
+																																																 
+						(EXISTS                                                                                                                                                                  
+							(   SELECT 1                                                                                                                                                         
+								FROM GLSG_PLANORISCOPERCURSOS PRP                                                                                                                                
+								INNER JOIN GLOP_VIAGEMPARADAS VP  ON VP.VIAGEM = :VIAGEM AND VP.PERCURSO = PRP.PERCURSO AND VP.PARADAEFETUADA = 'N' AND VP.PARADACANCELADA= 'N'                  
+								INNER JOIN GLOP_VIAGEMDOCUMENTOS DV  ON DV.VIAGEM = :VIAGEM AND (NOT (DV.SITUACAO IN (:STCONCLUIDO, :STCONCLUIDORST, :STCANCELADO, :STTRANSBORDO)))              
+								AND                                                                                                                                                              
+								(                                                                                                                                                                
+									(EXISTS                                                                                                                                                      
+										(  SELECT CP.HANDLE                                                                                                                                      
+										   FROM GLOP_COLETAPEDIDOS CP                                                                                                                            
+										   WHERE CP.HANDLE = DV.DOCUMENTOCOLETA                                                                                                                  
+										   AND CP.APOLICE = :APOLICE                                                                                                                             
+										)                                                                                                                                                        
+									)                                                                                                                                                            
+																																																 
+									OR                                                                                                                                                           
+																																																 
+									(EXISTS                                                                                                                                                      
+										(   SELECT AD.HANDLE                                                                                                                                     
+											FROM GLSG_AVERBACAODOCUMENTOS AD                                                                                                                     
+											WHERE AD.APOLICE = :APOLICE                                                                                                                          
+											AND AD.DOCUMENTOLOGISTICA = DV.DOCUMENTOLOGISTICA                                                                                                    
+										)                                                                                                                                                        
+									)                                                                                                                                                            
+								)                                                                                                                                                                
+																																																 
+								WHERE PRP.PLANORISCODESC = RD.HANDLE                                                                                                                             
+							)                                                                                                                                                                    
+						)                                                                                                                                                                        
+					)                                                                                                                                                                            
+																																																 
+																																																 
+					AND                                                                                                                                                                          
+																																																 
+					(                                                                                                                                                                            
+						(RD.CONJUNTOVEICULO = 'N')                                                                                                                                               
+																																																 
+						OR                                                                                                                                                                       
+																																																 
+						(  EXISTS                                                                                                                                                                
+							(   SELECT CONJUNTO.NOME                                                                                                                                             
+								FROM                                                                                                                                                             
+									  GLOP_CONJUNTOVEICULOS CONJUNTO                                                                                                                             
+										  INNER JOIN GLSG_PLANORISCOCONJUNTOS RISCOCONJUNTO ON (RISCOCONJUNTO.CONJUNTOVEICULOS=CONJUNTO.HANDLE),                                                 
+									  GLOP_VIAGENS VIAGEM                                                                                                                                        
+										  LEFT JOIN MA_RECURSOS VEIC1 ON (VIAGEM.VEICULO1=VEIC1.HANDLE)                                                                                          
+										  LEFT JOIN MA_RECURSOS VEIC2 ON (VIAGEM.VEICULO2=VEIC2.HANDLE)                                                                                          
+										  LEFT JOIN MA_RECURSOS VEIC3 ON (VIAGEM.VEICULO3=VEIC3.HANDLE)                                                                                          
+										  LEFT JOIN MA_RECURSOS VEIC4 ON (VIAGEM.VEICULO4=VEIC4.HANDLE)                                                                                          
+								WHERE VIAGEM.HANDLE = :VIAGEM                                                                                                                                    
+								AND CONJUNTO.STATUS = 2                                                                                                                                          
+								AND RISCOCONJUNTO.PLANORISCODESCRICAO=RD.HANDLE                                                                                                                  
+								AND                                                                                                                                                              
+								(                                                                                                                                                                
+										" + SqlResources.IsNull("CONJUNTO.TIPOVEICULO1", "-1") + " = " + SqlResources.IsNull("VEIC1.TIPOVEICULO", "-1"));
+									AND " + SqlResources.IsNull("CONJUNTO.TIPOVEICULO2", "-1") + " = " + SqlResources.IsNull("VEIC2.TIPOVEICULO", "-1"));
+									AND " + SqlResources.IsNull("CONJUNTO.TIPOVEICULO3", "-1") + " = " + SqlResources.IsNull("VEIC3.TIPOVEICULO", "-1"));
+									AND " + SqlResources.IsNull("CONJUNTO.TIPOVEICULO4", "-1") + " = " + SqlResources.IsNull("VEIC4.TIPOVEICULO", "-1"));
+								)                                                                                                                                                                
+							)                                                                                                                                                                    
+						)                                                                                                                                                                        
+					)                                                                                                                                                                            
+				)                                                                                                                                                                                
+			)                                                                                                                                                                                    
+		)            
+		GROUP BY RD.HANDLE,       		
+				 RD.DESCRICAO,    
+				 PR.GERENCIADORA, 
+				 RD.GRUPODIVERSOS,
+				 PR.MOEDA         
+		ORDER BY 1                

@@ -27,6 +27,7 @@ namespace VistoriasProjeto.Dao
             var sql = $"DELETE FROM {EntityName} WHERE ID = @ID";
             try
             {
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@ID", id);
                 Command.ExecuteNonQuery();
@@ -49,6 +50,8 @@ namespace VistoriasProjeto.Dao
 
             try
             {
+                ConnectionHelper.Init(Connection, Command);
+
                 Command.CommandText = sql;
 
                 Reader = Command.ExecuteReader();
@@ -87,6 +90,7 @@ namespace VistoriasProjeto.Dao
 
             try
             {
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@ID", id);
 
@@ -123,6 +127,7 @@ namespace VistoriasProjeto.Dao
 
             try
             {
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@VISTORIAID", idVistoria);
 
@@ -153,14 +158,19 @@ namespace VistoriasProjeto.Dao
             }
         }
 
-        public List<Ocorrencia> GetOcorrenciasByFilter(string filter)
+        public List<Ocorrencia> GetOcorrenciasByFilter(string descricao, int idVistoria, DateTime dataInicial, DateTime dataFinal, ETipoOcorrencia tipo)
         {
             var ocorrencias = new List<Ocorrencia>();
-            var sql = $"SELECT * FROM {EntityName}";
+            var sql = $"SELECT * FROM {EntityName} A" + 
+                Ocorrencia.MontaWhereSql(descricao, idVistoria, dataInicial, dataFinal, tipo);
             MySqlDataReader Reader;
 
             try
             {
+                ConnectionHelper.Init(Connection, Command);
+
+                Ocorrencia.MontaParametrosSql(Command, descricao, idVistoria,dataInicial, dataFinal, tipo);
+
                 Command.CommandText = sql;
 
                 Reader = Command.ExecuteReader();
@@ -181,7 +191,6 @@ namespace VistoriasProjeto.Dao
             }
             catch (Exception)
             {
-
                 throw;
             }
             finally
@@ -196,6 +205,7 @@ namespace VistoriasProjeto.Dao
                       $"VALUES (@DATAOCORRENCIA, @DESCRICAO, @TIPO, @VISTORIAID)";
             try
             {
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@DATAOCORRENCIA", entity.DataOcorrencia);
                 Command.Parameters.AddWithValue("@DESCRICAO", entity.Descricao);
@@ -215,10 +225,11 @@ namespace VistoriasProjeto.Dao
 
         public void Update(Ocorrencia entity)
         {
-            var sql = $"UPDATE {EntityName} SET DATAOCORRENCIA = @DATAOCORRENCIA AND DESCRICAO = @DESCRICAO AND TIPO = @TIPO AND VISTORIAID = @VISTORIAID WHERE ID = @ID";
+            var sql = $"UPDATE {EntityName} SET DATAOCORRENCIA = @DATAOCORRENCIA, DESCRICAO = @DESCRICAO, TIPO = @TIPO, VISTORIAID = @VISTORIAID WHERE ID = @ID";
 
             try
             {
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@DATAOCORRENCIA", entity.DataOcorrencia);
                 Command.Parameters.AddWithValue("@DESCRICAO", entity.Descricao);
@@ -229,7 +240,6 @@ namespace VistoriasProjeto.Dao
             }
             catch (Exception)
             {
-
                 throw;
             }
             finally

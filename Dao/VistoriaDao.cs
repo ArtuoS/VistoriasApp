@@ -10,7 +10,7 @@ namespace VistoriasProjeto.Dao
     public class VistoriaDao : IVistoriaDao
     {
         private readonly MySqlConnection Connection = new MySqlConnection(Utilitarios.ConnectionString);
-        private readonly MySqlCommand Command = new MySqlCommand();
+        private MySqlCommand Command = new MySqlCommand();
 
         public VistoriaDao()
         {
@@ -25,6 +25,7 @@ namespace VistoriasProjeto.Dao
             var sql = $"DELETE FROM {EntityName} WHERE ID = @ID";
             try
             {
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@ID", id);
                 Command.ExecuteNonQuery();
@@ -47,6 +48,8 @@ namespace VistoriasProjeto.Dao
 
             try
             {
+                ConnectionHelper.Init(Connection, Command);
+
                 Command.CommandText = sql;
 
                 Reader = Command.ExecuteReader();
@@ -56,7 +59,7 @@ namespace VistoriasProjeto.Dao
                     vistorias.Add(new Vistoria()
                     {
                         Id = Convert.ToInt32(Reader["ID"]),
-                        DataVistoria = Convert.ToDateTime(Reader["DATAVISTORIA"]),
+                        DataVistoria = (Convert.ToDateTime(Reader["DATAVISTORIA"]) != null) ? Convert.ToDateTime(Reader["DATAVISTORIA"]) : DateTime.Now,
                         Descricao = Reader["DESCRICAO"].ToString(),
                         Localidade = Reader["LOCALIDADE"].ToString(),
                         Status = (EStatusVistoria)Enum.Parse(typeof(EStatusVistoria), Reader["STATUS"].ToString()),
@@ -85,6 +88,7 @@ namespace VistoriasProjeto.Dao
 
             try
             {
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@ID", id);
                 Reader = Command.ExecuteReader();
@@ -124,6 +128,7 @@ namespace VistoriasProjeto.Dao
                       $"VALUES (@DATAVISTORIA, @DESCRICAO, @LOCALIDADE, @STATUS, @USUARIOID, @IMAGEM)";
             try
             {
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@DATAVISTORIA", entity.DataVistoria);
                 Command.Parameters.AddWithValue("@LOCALIDADE", entity.Localidade);
@@ -145,20 +150,19 @@ namespace VistoriasProjeto.Dao
 
         public void Update(Vistoria entity)
         {
-            var vistoria = GetById(entity.Id);
-            var sql = $"UPDATE {EntityName} SET DATAVISTORIA = @DATAVISTORIA AND DESCRICAO = @DESCRICAO AND LOCALIDADE = @LOCALIDADE " +
-                      $"AND STATUS = @STATUS AND USUARIOID = @USUARIOID WHERE ID = @ID";
+            var sql = $"UPDATE {EntityName} SET IMAGEM = @IMAGEM, DESCRICAO = @DESCRICAO, LOCALIDADE = @LOCALIDADE " +
+                      $", STATUS = @STATUS, USUARIOID = @USUARIOID WHERE ID = @ID";
 
             try
             {
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
-                Command.Parameters.AddWithValue("@DATAVISTORIA", (vistoria.DataVistoria != entity.DataVistoria) ? entity.DataVistoria : vistoria.DataVistoria);
-                Command.Parameters.AddWithValue("@LOCALIDADE", (vistoria.Localidade != entity.Localidade) ? entity.Localidade : vistoria.Localidade);
-                Command.Parameters.AddWithValue("@USUARIOID", (vistoria.UsuarioId != entity.UsuarioId) ? entity.UsuarioId : vistoria.UsuarioId);
-                Command.Parameters.AddWithValue("@DESCRICAO", (vistoria.Descricao != entity.Descricao) ? entity.Descricao : vistoria.Descricao);
-                Command.Parameters.AddWithValue("@STATUS", ((int)vistoria.Status != (int)entity.Status) ? (int)entity.Status : (int)vistoria.Status);
-                Command.Parameters.AddWithValue("@ID", (vistoria.Id != entity.Id) ? entity.Id : vistoria.Id);
-                Command.Parameters.AddWithValue("@IMAGEM", (vistoria.Imagem != entity.Imagem) ? entity.Imagem : vistoria.Imagem));
+                Command.Parameters.AddWithValue("@LOCALIDADE", entity.Localidade);
+                Command.Parameters.AddWithValue("@USUARIOID", entity.UsuarioId);
+                Command.Parameters.AddWithValue("@DESCRICAO", entity.Descricao);
+                Command.Parameters.AddWithValue("@STATUS", (int)entity.Status);
+                Command.Parameters.AddWithValue("@ID", entity.Id);
+                Command.Parameters.AddWithValue("@IMAGEM", entity.Imagem);
                 Command.ExecuteNonQuery();
             }
             catch (Exception)

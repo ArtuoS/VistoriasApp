@@ -82,10 +82,10 @@
                     <asp:TemplateField>
                         <ItemTemplate>
                             <asp:Button ID="btnConsulta" runat="server"
-                                CommandName="Consulta"
+                                CommandName="Consultar"
                                 CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
-                                Text="Inserir"
-                                OnClick="btnInserir_Click" />
+                                Text="Consultar"
+                                OnClick="btnConsulta_Click" />
                             <asp:Button ID="btnAtualizar" runat="server"
                                 CommandName="Atualizar"
                                 CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"

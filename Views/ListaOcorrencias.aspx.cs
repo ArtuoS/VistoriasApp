@@ -47,8 +47,27 @@ namespace VistoriasProjeto.Views
             if (vistoriaId != GLOBALS.Invalid_Id)
             {
                 var ocorrencias = OcorrenciaDao.GetByVistoria(vistoriaId);
-                dgvOcorrencias.DataSource = ocorrencias;
-                dgvOcorrencias.DataBind();
+                dgvOcorrencia.DataSource = ocorrencias;
+                dgvOcorrencia.DataBind();
+            }
+        }
+
+        private void AtualizarOcorrenciasByFilter()
+        {
+            int vistoriaId = Request.QueryString["id"] != null ? Convert.ToInt32(Request.QueryString["id"].ToString()) : GLOBALS.Invalid_Id;
+
+            if (vistoriaId != GLOBALS.Invalid_Id)
+            {
+                var ocorrencias = OcorrenciaDao.GetOcorrenciasByFilter(
+                    descricao: (txtDescricao.Text != string.Empty) ? txtDescricao.Text : "",
+                    idVistoria: (txtIdVistoria.Text != string.Empty) ? Convert.ToInt32(txtIdVistoria.Text) : -1,
+                    dataInicial: (txtDataInicial.Text != string.Empty) ? Convert.ToDateTime(txtDataInicial.Text, GLOBALS.Culture) : default(DateTime),
+                    dataFinal: (txtDataFinal.Text != string.Empty) ? Convert.ToDateTime(txtDataFinal.Text, GLOBALS.Culture) : default(DateTime),
+                    tipo: (dplTipo != null) ? (ETipoOcorrencia)Enum.Parse(typeof(ETipoOcorrencia), dplTipo.SelectedValue) : 0
+                    );
+
+                dgvOcorrencia.DataSource = ocorrencias;
+                dgvOcorrencia.DataBind();
             }
         }
 
@@ -57,15 +76,15 @@ namespace VistoriasProjeto.Views
             if (vistoriaId != GLOBALS.Invalid_Id)
             {
                 var ocorrencias = OcorrenciaDao.GetByVistoria(vistoriaId);
-                dgvOcorrencias.DataSource = ocorrencias;
-                dgvOcorrencias.DataBind();
+                dgvOcorrencia.DataSource = ocorrencias;
+                dgvOcorrencia.DataBind();
             }
         }
 
         protected void btnPesquisar_Click(object sender, EventArgs e)
         {
             int vistoriaId = Request.QueryString["id"] != null ? Convert.ToInt32(Request.QueryString["id"].ToString()) : GLOBALS.Invalid_Id;
-            AtualizarOcorrencias(vistoriaId);
+            AtualizarOcorrenciasByFilter();
         }
 
         protected void btnInserirOcorrencia_Click(object sender, EventArgs e)
@@ -75,6 +94,32 @@ namespace VistoriasProjeto.Views
             {
                 Response.Redirect($"CadastroOcorrencia.aspx?vistoriaId={vistoriaId}&action=Inserir");
             }
+        }
+
+        protected void dgvOcorrencia_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            int rowIndex = Convert.ToInt32(e.CommandArgument);
+            var row = dgvOcorrencia.Rows[rowIndex];
+            int id = Convert.ToInt32(row.Cells[5].Text);
+            int ocorrenciaId = Convert.ToInt32(row.Cells[1].Text);
+
+            if (e.CommandName == "Consultar" || e.CommandName == "Atualizar" || e.CommandName == "Excluir")
+                Response.Redirect($"CadastroOcorrencia.aspx?vistoriaId={id}&ocorrenciaId={ocorrenciaId}&action={e.CommandName}");
+        }
+
+        protected void btnConsulta_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnAtualizar_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnExcluir_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

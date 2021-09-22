@@ -8,5 +8,6 @@ namespace VistoriasProjeto.Models.Interfaces
 {
     interface IOcorrencia
     {
+        void ClonarPropriedades(Ocorrencia novaOcorrencia);
     }
 }

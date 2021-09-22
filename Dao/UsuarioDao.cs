@@ -46,7 +46,7 @@ namespace VistoriasProjeto.Dao
 
             try
             {
-                ConnectionHelper.OpenConnection(Connection);
+                ConnectionHelper.Init(Connection, Command);
 
                 Command.CommandText = sql;
 
@@ -86,7 +86,7 @@ namespace VistoriasProjeto.Dao
 
             try
             {
-                ConnectionHelper.OpenConnection(Connection);
+                ConnectionHelper.Init(Connection, Command);
 
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@ID", id);
@@ -124,8 +124,7 @@ namespace VistoriasProjeto.Dao
 
             try
             {
-                ConnectionHelper.OpenConnection(Connection);
-
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@LOGIN", login);
                 Command.Parameters.AddWithValue("@SENHA", senha);
@@ -163,8 +162,7 @@ namespace VistoriasProjeto.Dao
 
             try
             {
-                ConnectionHelper.OpenConnection(Connection);
-
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@ID", id);
 
@@ -194,8 +192,7 @@ namespace VistoriasProjeto.Dao
                       $"VALUES (@LOGIN, @SENHA, @PERFIL, @NOME) WHERE ID = @ID";
             try
             {
-                ConnectionHelper.OpenConnection(Connection);
-
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@LOGIN", entity.Login);
                 Command.Parameters.AddWithValue("@SENHA", entity.Senha);
@@ -220,8 +217,7 @@ namespace VistoriasProjeto.Dao
 
             try
             {
-                ConnectionHelper.OpenConnection(Connection);
-
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@LOGIN", entity.Login);
                 Command.Parameters.AddWithValue("@SENHA", entity.Senha);
@@ -250,8 +246,7 @@ namespace VistoriasProjeto.Dao
 
             try
             {
-                ConnectionHelper.OpenConnection(Connection);
-
+                ConnectionHelper.Init(Connection, Command);
                 Command.CommandText = sql;
                 Command.Parameters.AddWithValue("@LOGIN", login);
                 Command.Parameters.AddWithValue("@SENHA", senha);

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace VistoriasProjeto.Models.Interfaces
 {
-    interface IVistoria
+    public interface IVistoria
     {
+        void ClonarPropriedades(Vistoria novaVistoria);
     }
 }

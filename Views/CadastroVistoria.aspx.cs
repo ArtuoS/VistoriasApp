@@ -71,6 +71,18 @@ namespace VistoriasProjeto.Views
                         btnInserir.Enabled = false;
                         btnAtualizar.Enabled = false;
                         break;
+                    case "Consultar":
+                        txtData.ReadOnly = true;
+                        txtDescricao.ReadOnly = true;
+                        txtEndereco.ReadOnly = true;
+                        txtIdResponsavel.ReadOnly = true;
+                        txtIdVistoria.ReadOnly = true;
+                        dplStatus.Enabled = false;
+                        fuFoto.Enabled = false;
+                        btnInserir.Enabled = false;
+                        btnAtualizar.Enabled = false;
+                        btnExcluir.Enabled = false;
+                        break;
                 }
             }
         }
@@ -101,24 +113,32 @@ namespace VistoriasProjeto.Views
         {
             int id = Request.QueryString["id"] != null ? Convert.ToInt32(Request.QueryString["id"].ToString()) : GLOBALS.Invalid_Id;
 
-            var vistoria = new Vistoria()
+            if (id != GLOBALS.Invalid_Id)
             {
-                Id = id,
-                Localidade = txtEndereco.Text,
-                DataVistoria = Convert.ToDateTime(txtData.Text, GLOBALS.Culture),
-                UsuarioId = Convert.ToInt32(txtIdResponsavel.Text),
-                Descricao = txtDescricao.Text,
-                Status = (EStatusVistoria)Enum.Parse(typeof(EStatusVistoria), dplStatus.SelectedValue),
-        };
+                var vistoriaPadrao = VistoriaDao.GetById(id);
 
-            VistoriaDao.Update(vistoria);
+                var novaVistoria = new Vistoria()
+                {
+                    Id = id,
+                    Localidade = (txtEndereco != null) ? txtEndereco.Text : "",
+                    DataVistoria = (txtData != null) ? Convert.ToDateTime(txtData.Text, GLOBALS.Culture) : default(DateTime),
+                    UsuarioId = (txtIdResponsavel != null) ? Convert.ToInt32(txtIdResponsavel.Text) : GLOBALS.Invalid_Id,
+                    Descricao = (txtDescricao != null) ? txtDescricao.Text : "",
+                    Status = (EStatusVistoria)Enum.Parse(typeof(EStatusVistoria), dplStatus.SelectedValue),
+                    Imagem = (fuFoto != null) ? GLOBALS.MontarFilePath(fuFoto.FileName) : "",
+                };
+
+                vistoriaPadrao.ClonarPropriedades(novaVistoria);
+
+                VistoriaDao.Update(vistoriaPadrao);
+            }
         }
 
         protected void btnFechar_Click(object sender, EventArgs e)
         {
-
+            Response.Redirect("ListaVistorias.aspx");
         }
-    
+
         private void SalvarImagem()
         {
             fuFoto.SaveAs(GLOBALS.MontarFilePath(fuFoto.FileName));

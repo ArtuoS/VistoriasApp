@@ -67,8 +67,29 @@
         <div>
             <asp:Button Text="Inserir Ocorrências" ID="btnInserirOcorrencia" runat="server" OnClick="btnInserirOcorrencia_Click" />
             <div>
-                <asp:DataGrid ID="dgvOcorrencias" runat="server">
-                </asp:DataGrid>
+                <asp:GridView ID="dgvOcorrencia" OnRowCommand="dgvOcorrencia_RowCommand" runat="server">
+                    <Columns>
+                        <asp:TemplateField>
+                            <ItemTemplate>
+                                <asp:Button ID="btnConsulta" runat="server"
+                                    CommandName="Consultar"
+                                    CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
+                                    Text="Consultar"
+                                    OnClick="btnConsulta_Click" />
+                                <asp:Button ID="btnAtualizar" runat="server"
+                                    CommandName="Atualizar"
+                                    CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
+                                    Text="Atualizar"
+                                    OnClick="btnAtualizar_Click" />
+                                <asp:Button ID="btnExcluir" runat="server"
+                                    CommandName="Excluir"
+                                    CommandArgument="<%# ((GridViewRow) Container).RowIndex %>"
+                                    Text="Excluir"
+                                    OnClick="btnExcluir_Click" />
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                    </Columns>
+                </asp:GridView>
             </div>
         </div>
     </form>
