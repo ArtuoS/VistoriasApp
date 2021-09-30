@@ -40,6 +40,8 @@ namespace VistoriasProjeto.Views
                 GLOBALS.UsuarioLogado = usuario;
                 GerenciarRedirecionamento();
             }
+            else
+                Response.Write("<script>alert('Login inválido!');</script>");
         }
 
         private void GerenciarRedirecionamento()

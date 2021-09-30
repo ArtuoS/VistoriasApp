@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using VistoriasProjeto.Dao.Interfaces;
 using VistoriasProjeto.Models;
 using VistoriasProjeto.Models.Enumeradores;
+using System.Web.UI;
+using VistoriasProjeto.Views;
 
 namespace VistoriasProjeto.Dao
 {
@@ -32,7 +34,6 @@ namespace VistoriasProjeto.Dao
             }
             catch (Exception)
             {
-                throw;
             }
             finally
             {
@@ -117,9 +118,47 @@ namespace VistoriasProjeto.Dao
             }
         }
 
-        public Vistoria GetVistoriaByFilter(string filter)
+        public List<Vistoria> GetVistoriaByFilter(int idVistoria, DateTime dataInicial, DateTime dataFinal, string endereco, int idUsuarioResponsavel, EStatusVistoria status)
         {
-            throw new NotImplementedException();
+            var vistorias = new List<Vistoria>();
+            var sql = $"SELECT * FROM {EntityName} A" +
+                Vistoria.MontaWhereSql(idVistoria, dataInicial, dataFinal, endereco, idUsuarioResponsavel, status);
+            MySqlDataReader Reader;
+
+            try
+            {
+                ConnectionHelper.Init(Connection, Command);
+
+                Vistoria.MontaParametrosSql(Command, idVistoria, dataInicial, dataFinal, endereco, idUsuarioResponsavel, status);
+
+                Command.CommandText = sql;
+
+                Reader = Command.ExecuteReader();
+
+                while (Reader.Read())
+                {
+                    vistorias.Add(new Vistoria()
+                    {
+                        Id = Convert.ToInt32(Reader["ID"]),
+                        DataVistoria = (Convert.ToDateTime(Reader["DATAVISTORIA"]) != null) ? Convert.ToDateTime(Reader["DATAVISTORIA"]) : DateTime.Now,
+                        Descricao = Reader["DESCRICAO"].ToString(),
+                        Localidade = Reader["LOCALIDADE"].ToString(),
+                        Status = (EStatusVistoria)Enum.Parse(typeof(EStatusVistoria), Reader["STATUS"].ToString()),
+                        UsuarioId = Convert.ToInt32(Reader["USUARIOID"]),
+                        Imagem = Reader["IMAGEM"].ToString()
+                    });
+                }
+
+                return vistorias;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+            finally
+            {
+                ConnectionHelper.CloseConnection(Connection);
+            }
         }
 
         public void Insert(Vistoria entity)

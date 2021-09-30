@@ -50,8 +50,7 @@ namespace VistoriasProjeto.Views
 
         protected void btnPesquisar_Click(object sender, EventArgs e)
         {
-            var vistorias = VistoriaDao.GetAll();
-            AtualizarGridVistoriasPorListaVistorias(vistorias);
+            AtualizarGridByFilter();
         }
 
         private void AtualizarGridVistorias()
@@ -62,25 +61,19 @@ namespace VistoriasProjeto.Views
             dgvVistorias.DataBind();
         }
 
-        private void AtualizarGridVistoriasPorListaVistorias(List<Vistoria> vistorias)
-        {
-            dgvVistorias.DataSource = vistorias;
-            dgvVistorias.DataBind();
-        }
-
         protected void dgvVistorias_RowCommand(object sender, GridViewCommandEventArgs e)
         {
             int rowIndex = Convert.ToInt32(e.CommandArgument);
             var row = dgvVistorias.Rows[rowIndex];
-            int id = Convert.ToInt32(row.Cells[2].Text);
+            int id = Convert.ToInt32(row.Cells[1].Text);
 
             if (GLOBALS.UsuarioLogado != null && GLOBALS.UsuarioLogado.Perfil == EPerfilUsuario.Operador)
             {
                 if (e.CommandName == "Atualizar" || e.CommandName == "Excluir")
                     ScriptManager.RegisterStartupScript(this, GetType(), "showalert", $"alert('O comando {e.CommandName} não está disponível para o grupo {GLOBALS.UsuarioLogado.Perfil.ToString()}');", true);
                 else if (e.CommandName == "Ocorrencias")
-                    Response.Redirect($"ListaOcorrencias.aspx?id={id}");
-                else if(e.CommandName == "Consultar")
+                    ScriptManager.RegisterStartupScript(this, GetType(), "showalert", $"window.open('ListaOcorrencias.aspx?id={id}','Teste','width=1020, Height=720');", true);
+                else if (e.CommandName == "Consultar")
                     Response.Redirect($"CadastroVistoria.aspx?action={e.CommandName}");
             }
             else
@@ -88,7 +81,7 @@ namespace VistoriasProjeto.Views
                 if (e.CommandName == "Atualizar" || e.CommandName == "Excluir")
                     Response.Redirect($"CadastroVistoria.aspx?id={id}&action={e.CommandName}");
                 else if (e.CommandName == "Ocorrencias")
-                    Response.Redirect($"ListaOcorrencias.aspx?id={id}");
+                    ScriptManager.RegisterStartupScript(this, GetType(), "showalert", $"window.open('ListaOcorrencias.aspx?id={id}','Teste','width=1020, Height=720');", true);
                 else if (e.CommandName == "Consultar")
                     Response.Redirect($"CadastroVistoria.aspx?action={e.CommandName}");
             }
@@ -117,6 +110,28 @@ namespace VistoriasProjeto.Views
         protected void btnConsulta_Click(object sender, EventArgs e)
         {
             //Response.Redirect($"CadastroOcorrencia.aspx?id={id}&action={e.CommandName}");
+        }
+
+        private void AtualizarGridByFilter()
+        {
+            try
+            {
+                var vistorias = VistoriaDao.GetVistoriaByFilter(
+                idVistoria: (txtIdVistoria.Text != string.Empty) ? Convert.ToInt32(txtIdVistoria.Text) : -1,
+                dataInicial: (txtDataInicial.Text != string.Empty) ? Convert.ToDateTime(txtDataInicial.Text, GLOBALS.Culture) : default(DateTime),
+                dataFinal: (txtDataFinal.Text != string.Empty) ? Convert.ToDateTime(txtDataFinal.Text, GLOBALS.Culture) : default(DateTime),
+                endereco: (txtEndereco.Text != string.Empty) ? txtEndereco.Text : "",
+                idUsuarioResponsavel: (txtIdUsuario.Text != string.Empty) ? Convert.ToInt32(txtIdUsuario.Text) : -1,
+                status: (dplStatus != null) ? (EStatusVistoria)Enum.Parse(typeof(EStatusVistoria), dplStatus.SelectedValue) : 0
+                );
+
+                dgvVistorias.DataSource = vistorias;
+                dgvVistorias.DataBind();
+            }
+            catch
+            {
+                AtualizarGridVistorias();
+            }
         }
     }
 }

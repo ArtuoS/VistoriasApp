@@ -61,26 +61,59 @@ namespace VistoriasProjeto.Models
 
         public static string MontaWhereSql(string descricao, int idVistoria, DateTime dataInicial, DateTime dataFinal, ETipoOcorrencia tipo)
         {
+            bool primeiro = true;
             var sql = @" WHERE ";
 
             if (!string.IsNullOrWhiteSpace(descricao))
             {
-                sql += @"A.DESCRICAO = @DESCRICAO AND ";
+                if (primeiro)
+                {
+                    primeiro = false;
+                    sql += @" A.DESCRICAO = @DESCRICAO% ";
+                }
+                else
+                {
+                    sql += @" AND A.DESCRICAO = @DESCRICAO ";
+                }
             }
 
             if (idVistoria > 0)
             {
-                sql += @"A.VISTORIAID = @VISTORIAID AND ";
+                if (primeiro)
+                {
+                    primeiro = false;
+                    sql += @" A.VISTORIAID = @VISTORIAID ";
+                }
+                else
+                {
+                    sql += @" A.VISTORIAID = @VISTORIAID ";
+                }
             }
 
             if (dataInicial != default(DateTime) && dataFinal != default(DateTime))
             {
-                sql += @"A.DATAOCORRENCIA BETWEEN @DATAOCORRENCIA AND @DATAOCORRENCIAFINAL AND ";
+                if (primeiro)
+                {
+                    primeiro = false;
+                    sql += @" A.DATAOCORRENCIA BETWEEN @DATAOCORRENCIA AND @DATAOCORRENCIAFINAL ";
+                }
+                else
+                {
+                    sql += @" AND A.DATAOCORRENCIA BETWEEN @DATAOCORRENCIA AND @DATAOCORRENCIAFINAL ";
+                }
             }
 
             if (tipo != ETipoOcorrencia.Ambiental || tipo != ETipoOcorrencia.Patrimonial)
             {
-                sql += @"A.TIPO = @TIPO";
+                if (primeiro)
+                {
+                    primeiro = false;
+                    sql += @" A.TIPO = @TIPO";
+                }
+                else
+                {
+                    sql += @" AND A.TIPO = @TIPO";
+                }
             }
 
             return sql;
@@ -95,13 +128,13 @@ namespace VistoriasProjeto.Models
 
             if (idVistoria > 0)
             {
-                command.Parameters.AddWithValue("@VISTORIA_ID", idVistoria);
+                command.Parameters.AddWithValue("@VISTORIAID", idVistoria);
             }
 
             if (dataInicial != default(DateTime) && dataFinal != default(DateTime))
             {
-                command.Parameters.AddWithValue("@DATAOCORRENCIA", dataInicial.ToString("dd/MM/YYYY"));
-                command.Parameters.AddWithValue("@DATAOCORRENCIAFINAL", dataFinal.ToString("dd/MM/YYYY"));
+                command.Parameters.AddWithValue("@DATAOCORRENCIA", dataInicial.ToString("yyyy/MM/dd"));
+                command.Parameters.AddWithValue("@DATAOCORRENCIAFINAL", dataFinal.ToString("yyyy/MM/dd"));
             }
 
             if (tipo != ETipoOcorrencia.Ambiental || tipo != ETipoOcorrencia.Patrimonial)

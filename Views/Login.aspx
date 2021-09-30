@@ -6,7 +6,6 @@
 <head runat="server">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link href="../Content/Login.css" rel="stylesheet" />
-    <style></style>
     <title>Login</title>
 </head>
 <body>

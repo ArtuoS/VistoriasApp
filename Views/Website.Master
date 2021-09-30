@@ -4,19 +4,43 @@
 
 <html>
 <head runat="server">
-    <title></title>
-    <asp:ContentPlaceHolder ID="head" runat="server">
-    </asp:ContentPlaceHolder>
+    <title>WebSite</title>
+    <link id="css1" runat="server" href="../Content/Web.Master.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        #imgGlobe {
+            height: 118px;
+            width: 100px;
+        }
+
+        #imgExit {
+            height: 50px;
+            width: 110px;
+            float: right;
+            margin-top: 25px;
+        }
+    </style>
 </head>
 <body>
     <form id="form1" runat="server">
+        <div id="images">
+            <img id="imgGlobe" runat="server" src="https://thumbs.dreamstime.com/b/green-world-logo-icon-design-template-214183157.jpg" />&nbsp;
+            <img id="imgExit" runat="server" src="https://icon-library.com/images/exit-button-icon/exit-button-icon-1.jpg" />
+        </div>
         <div>
             <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
-                <div>
-                    <asp:Image ID="imgLogo" runat="server" ImageUrl="https://thumbs.dreamstime.com/b/green-world-logo-icon-design-template-214183157.jpg" Width="100px"/>
-                </div>
             </asp:ContentPlaceHolder>
         </div>
     </form>
 </body>
 </html>
+
+<script>
+    var imgLogo = document.getElementById('imgExit');
+    imgLogo.addEventListener('click', () => {
+        if (document.URL.indexOf("ListaOcorrencias") >= 0) {
+            window.close();
+        } else {
+            location.href = "Login.aspx";
+        }
+    });
+</script>

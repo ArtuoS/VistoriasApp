@@ -95,7 +95,7 @@ namespace VistoriasProjeto.Views
             vistoria.UsuarioId = Convert.ToInt32(txtIdResponsavel.Text);
             vistoria.Descricao = txtDescricao.Text;
             vistoria.Status = (EStatusVistoria)Enum.Parse(typeof(EStatusVistoria), dplStatus.SelectedValue);
-            vistoria.Imagem = GLOBALS.MontarFilePath(fuFoto.FileName);
+            vistoria.Imagem = GLOBALS.MontarFilePathRelative(fuFoto.FileName);
 
             SalvarImagem();
 
@@ -107,6 +107,8 @@ namespace VistoriasProjeto.Views
             int id = Convert.ToInt32(txtIdVistoria.Text);
 
             VistoriaDao.Delete(id);
+
+            Response.Redirect("ListaVistorias.aspx");
         }
 
         protected void btnAtualizar_Click(object sender, EventArgs e)
@@ -120,12 +122,12 @@ namespace VistoriasProjeto.Views
                 var novaVistoria = new Vistoria()
                 {
                     Id = id,
-                    Localidade = (txtEndereco != null) ? txtEndereco.Text : "",
-                    DataVistoria = (txtData != null) ? Convert.ToDateTime(txtData.Text, GLOBALS.Culture) : default(DateTime),
-                    UsuarioId = (txtIdResponsavel != null) ? Convert.ToInt32(txtIdResponsavel.Text) : GLOBALS.Invalid_Id,
-                    Descricao = (txtDescricao != null) ? txtDescricao.Text : "",
+                    Localidade = (txtEndereco.Text != string.Empty) ? txtEndereco.Text : "",
+                    DataVistoria = (txtData.Text != string.Empty) ? Convert.ToDateTime(txtData.Text, GLOBALS.Culture) : default(DateTime),
+                    UsuarioId = (txtIdResponsavel.Text != string.Empty) ? Convert.ToInt32(txtIdResponsavel.Text) : GLOBALS.Invalid_Id,
+                    Descricao = (txtDescricao.Text != string.Empty) ? txtDescricao.Text : "",
                     Status = (EStatusVistoria)Enum.Parse(typeof(EStatusVistoria), dplStatus.SelectedValue),
-                    Imagem = (fuFoto != null) ? GLOBALS.MontarFilePath(fuFoto.FileName) : "",
+                    Imagem = (fuFoto.FileName != string.Empty) ? GLOBALS.MontarFilePathRelative(fuFoto.FileName) : "",
                 };
 
                 vistoriaPadrao.ClonarPropriedades(novaVistoria);
@@ -143,5 +145,6 @@ namespace VistoriasProjeto.Views
         {
             fuFoto.SaveAs(GLOBALS.MontarFilePath(fuFoto.FileName));
         }
+
     }
 }

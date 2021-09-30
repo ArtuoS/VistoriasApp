@@ -1,0 +1,14 @@
+﻿.gridview th {
+    color: #6600ff;
+    border: 1px solid black;
+    padding: 3px;
+    background-color: #bdc3ff;
+}
+
+.gridview td {
+    color: black;
+    padding: 3px;
+    border: 1px solid black;
+    text-align: center;
+    background-color: #d9d9d9;
+}

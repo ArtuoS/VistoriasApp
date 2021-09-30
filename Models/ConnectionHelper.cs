@@ -9,15 +9,18 @@ namespace VistoriasProjeto.Models
 {
     public class ConnectionHelper
     {
+        protected ConnectionHelper()
+        { }
+
         public static void CloseConnection(MySqlConnection connection)
         {
-            if(connection.State.Equals(ConnectionState.Open))
+            if (connection.State.Equals(ConnectionState.Open))
                 connection.Close();
         }
-        
+
         public static void OpenConnection(MySqlConnection connection)
         {
-            if(connection.State.Equals(ConnectionState.Closed))
+            if (connection.State.Equals(ConnectionState.Closed))
                 connection.Open();
         }
 

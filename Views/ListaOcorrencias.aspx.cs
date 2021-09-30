@@ -56,18 +56,25 @@ namespace VistoriasProjeto.Views
         {
             int vistoriaId = Request.QueryString["id"] != null ? Convert.ToInt32(Request.QueryString["id"].ToString()) : GLOBALS.Invalid_Id;
 
-            if (vistoriaId != GLOBALS.Invalid_Id)
+            try
             {
-                var ocorrencias = OcorrenciaDao.GetOcorrenciasByFilter(
-                    descricao: (txtDescricao.Text != string.Empty) ? txtDescricao.Text : "",
-                    idVistoria: (txtIdVistoria.Text != string.Empty) ? Convert.ToInt32(txtIdVistoria.Text) : -1,
-                    dataInicial: (txtDataInicial.Text != string.Empty) ? Convert.ToDateTime(txtDataInicial.Text, GLOBALS.Culture) : default(DateTime),
-                    dataFinal: (txtDataFinal.Text != string.Empty) ? Convert.ToDateTime(txtDataFinal.Text, GLOBALS.Culture) : default(DateTime),
-                    tipo: (dplTipo != null) ? (ETipoOcorrencia)Enum.Parse(typeof(ETipoOcorrencia), dplTipo.SelectedValue) : 0
-                    );
+                if (vistoriaId != GLOBALS.Invalid_Id)
+                {
+                    var ocorrencias = OcorrenciaDao.GetOcorrenciasByFilter(
+                        descricao: (txtDescricao.Text != string.Empty) ? txtDescricao.Text : "",
+                        idVistoria: (txtIdVistoria.Text != string.Empty) ? Convert.ToInt32(txtIdVistoria.Text) : -1,
+                        dataInicial: (txtDataInicial.Text != string.Empty) ? Convert.ToDateTime(txtDataInicial.Text, GLOBALS.Culture) : default(DateTime),
+                        dataFinal: (txtDataFinal.Text != string.Empty) ? Convert.ToDateTime(txtDataFinal.Text, GLOBALS.Culture) : default(DateTime),
+                        tipo: (dplTipo != null) ? (ETipoOcorrencia)Enum.Parse(typeof(ETipoOcorrencia), dplTipo.SelectedValue) : 0
+                        );
 
-                dgvOcorrencia.DataSource = ocorrencias;
-                dgvOcorrencia.DataBind();
+                    dgvOcorrencia.DataSource = ocorrencias;
+                    dgvOcorrencia.DataBind();
+                }
+            }
+            catch
+            {
+                AtualizarOcorrencias();
             }
         }
 

@@ -120,6 +120,9 @@ namespace VistoriasProjeto.Views
             int id = Convert.ToInt32(txtIdOcorrencia.Text);
 
             OcorrenciaDao.Delete(id);
+
+            int vistoriaId = Request.QueryString["vistoriaId"] != null ? Convert.ToInt32(Request.QueryString["vistoriaId"].ToString()) : GLOBALS.Invalid_Id;
+            Response.Redirect($"ListaOcorrencias?id={vistoriaId}");
         }
 
         protected void btnAtualizar_Click(object sender, EventArgs e)
@@ -142,11 +145,15 @@ namespace VistoriasProjeto.Views
 
                 OcorrenciaDao.Update(ocorrenciaPadrao);
             }
+
+            int vistoriaId = Request.QueryString["vistoriaId"] != null ? Convert.ToInt32(Request.QueryString["vistoriaId"].ToString()) : GLOBALS.Invalid_Id;
+            Response.Redirect($"ListaOcorrencias?id={vistoriaId}");
         }
 
         protected void btnFechar_Click(object sender, EventArgs e)
         {
-            Response.Redirect("ListaVistorias.aspx");
+            int vistoriaId = Request.QueryString["vistoriaId"] != null ? Convert.ToInt32(Request.QueryString["vistoriaId"].ToString()) : GLOBALS.Invalid_Id;
+            Response.Redirect($"ListaOcorrencias?id={vistoriaId}");
         }
 
         private void AtualizarGridOcorrenciasPorId(int id)
