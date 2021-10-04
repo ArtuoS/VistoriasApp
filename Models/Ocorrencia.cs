@@ -25,7 +25,7 @@ namespace VistoriasProjeto.Models
         public int Id { get; set; }
         public ETipoOcorrencia Tipo { get; set; }
         public DateTime DataOcorrencia { get; set; }
-        public string Descricao { get; set; }
+        public string Descricao { get; set; } = default(string);
         public int VistoriaId { get; set; }
         public Vistoria VistoriaInstance
         {

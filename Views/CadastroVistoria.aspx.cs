@@ -132,6 +132,9 @@ namespace VistoriasProjeto.Views
 
                 vistoriaPadrao.ClonarPropriedades(novaVistoria);
 
+                if (fuFoto.FileName != string.Empty)
+                    SalvarImagem();
+
                 VistoriaDao.Update(vistoriaPadrao);
             }
         }

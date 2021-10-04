@@ -81,7 +81,7 @@ namespace VistoriasProjeto.Views
                 if (e.CommandName == "Atualizar" || e.CommandName == "Excluir")
                     Response.Redirect($"CadastroVistoria.aspx?id={id}&action={e.CommandName}");
                 else if (e.CommandName == "Ocorrencias")
-                    ScriptManager.RegisterStartupScript(this, GetType(), "showalert", $"window.open('ListaOcorrencias.aspx?id={id}','Teste','width=1020, Height=720');", true);
+                    ScriptManager.RegisterStartupScript(this, GetType(), "showalert", $"alert('O comando {e.CommandName} não está disponível para o grupo {GLOBALS.UsuarioLogado.Perfil.ToString()}');", true);
                 else if (e.CommandName == "Consultar")
                     Response.Redirect($"CadastroVistoria.aspx?action={e.CommandName}");
             }

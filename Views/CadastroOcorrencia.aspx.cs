@@ -73,7 +73,7 @@ namespace VistoriasProjeto.Views
                         txtData.ReadOnly = true;
                         txtIdVistoria.Text = vistoriaId.ToString();
                         txtData.Text = DateTime.Now.ToString("dd/MM/yyyy");
-                        txtDescricao.Text = ocorrencia.Descricao;
+                        //txtDescricao.Text = ocorrencia.Descricao;
                         txtIdOcorrencia.Text = ocorrencia.Id.ToString();
                         break;
                     case "Excluir":
@@ -131,15 +131,13 @@ namespace VistoriasProjeto.Views
 
             if (id != GLOBALS.Invalid_Id)
             {
-                var ocorrenciaPadrao = OcorrenciaDao.GetById(id);
+                var ocorrenciaPadrao = OcorrenciaDao.GetById(Convert.ToInt32(txtIdOcorrencia.Text));
 
-                var novaOcorrencia = new Ocorrencia()
-                {
-                    VistoriaId = (txtIdVistoria != null) ? Convert.ToInt32(txtIdVistoria.Text) : GLOBALS.Invalid_Id,
-                    Tipo = (ETipoOcorrencia)Enum.Parse(typeof(ETipoOcorrencia), dplTipo.SelectedValue),
-                    Descricao = (txtDescricao != null) ? txtDescricao.Text : "",
-                    DataOcorrencia = (txtData != null) ? Convert.ToDateTime(txtData.Text, GLOBALS.Culture) : default(DateTime),
-                };
+                var novaOcorrencia = new Ocorrencia();
+                novaOcorrencia.VistoriaId = (txtIdVistoria != null) ? Convert.ToInt32(txtIdVistoria.Text) : GLOBALS.Invalid_Id;
+                novaOcorrencia.Tipo = (ETipoOcorrencia)Enum.Parse(typeof(ETipoOcorrencia), dplTipo.SelectedValue);
+                novaOcorrencia.Descricao = (txtDescricao.Text != string.Empty) ? txtDescricao.Text : "";
+                novaOcorrencia.DataOcorrencia = (txtData.Text != string.Empty) ? Convert.ToDateTime(txtData.Text, GLOBALS.Culture) : default(DateTime);
 
                 ocorrenciaPadrao.ClonarPropriedades(novaOcorrencia);
 

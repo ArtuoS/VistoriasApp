@@ -167,8 +167,8 @@ D:\C#\VistoriasApp-master\bin\Newtonsoft.Json.xml
 D:\C#\VistoriasApp-master\bin\Antlr3.Runtime.pdb
 D:\C#\VistoriasApp-master\bin\Microsoft.AspNet.FriendlyUrls.xml
 D:\C#\VistoriasApp-master\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\C#\VistoriasApp-master\obj\Debug\VistoriasProjeto.csproj.AssemblyReference.cache
 D:\C#\VistoriasApp-master\obj\Debug\VistoriasProjeto.csproj.CoreCompileInputs.cache
 D:\C#\VistoriasApp-master\obj\Debug\VistoriasProjeto.csproj.CopyComplete
 D:\C#\VistoriasApp-master\obj\Debug\VistoriasProjeto.dll
 D:\C#\VistoriasApp-master\obj\Debug\VistoriasProjeto.pdb
-D:\C#\VistoriasApp-master\obj\Debug\VistoriasProjeto.csproj.AssemblyReference.cache
